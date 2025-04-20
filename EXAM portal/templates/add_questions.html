@@ -1,0 +1,27 @@
+<h2>Add Question to Exam ID: {{ exam_id }}</h2>
+<form method="POST">
+  Question Text: <textarea name="question" required></textarea><br>
+  Type:
+  <select name="type">
+    <option value="MCQ">MCQ</option>
+    <option value="True/False">True/False</option>
+    <option value="Descriptive">Descriptive</option>
+  </select><br>
+  Marks: <input type="number" name="marks" required><br>
+  Difficulty:
+  <select name="difficulty">
+    <option value="Easy">Easy</option>
+    <option value="Medium">Medium</option>
+    <option value="Hard">Hard</option>
+  </select><br>
+
+  <div id="mcq-options">
+    Option 1: <input type="text" name="option_1"><br>
+    Option 2: <input type="text" name="option_2"><br>
+    Option 3: <input type="text" name="option_3"><br>
+    Option 4: <input type="text" name="option_4"><br>
+    Correct Option (1/2/3/4): <input type="text" name="correct"><br>
+  </div>
+
+  <button type="submit">Add Question</button>
+</form>

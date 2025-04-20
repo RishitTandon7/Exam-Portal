@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Teacher Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h2>Create Exam</h2>
+  <input type="text" id="subject" placeholder="Subject">
+  <input type="date" id="date">
+  <input type="number" id="duration" placeholder="Duration in mins">
+  <input type="number" id="faculty_id" placeholder="Your Faculty ID">
+  <button onclick="createExam()">Create</button>
+
+  <h2>Publish Result</h2>
+  <input type="number" id="student_id" placeholder="Student ID">
+  <input type="number" id="exam_id" placeholder="Exam ID">
+  <input type="number" id="score" placeholder="Score">
+  <select id="status">
+    <option>Pass</option>
+    <option>Fail</option>
+  </select>
+  <button onclick="publishResult()">Publish</button>
+
+  <p id="message"></p>
+  <script>
+    const API = 'http://127.0.0.1:5000';
+
+    function createExam() {
+      fetch(`${API}/create-exam`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          subject: document.getElementById('subject').value,
+          date: document.getElementById('date').value,
+          duration: document.getElementById('duration').value,
+          faculty_id: document.getElementById('faculty_id').value
+        })
+      }).then(res => res.json()).then(data => {
+        document.getElementById('message').innerText = data.message;
+      });
+    }
+
+    function publishResult() {
+      fetch(`${API}/publish-result`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          student_id: document.getElementById('student_id').value,
+          exam_id: document.getElementById('exam_id').value,
+          score: document.getElementById('score').value,
+          status: document.getElementById('status').value
+        })
+      }).then(res => res.json()).then(data => {
+        document.getElementById('message').innerText = data.message;
+      });
+    }
+  </script>
+</body>
+</html>
