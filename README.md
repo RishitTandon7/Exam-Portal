@@ -1,127 +1,37 @@
+# Exam Portal
 
-# 📝 Exam Portal - Flask Web Application
+This is a web-based Exam Portal application built with Flask and MySQL. It supports student and faculty roles, allowing exam creation, question management, exam taking, and result viewing.
 
-A web-based Exam Portal built with **Flask** and **MySQL**, allowing students and teachers to register, login, and manage exams. Teachers can create exams and add questions, while students can view their dashboard after login.
+## Features
 
----
+- User registration and login for students and faculty
+- Exam creation and question addition by faculty
+- Students can take exams and submit answers
+- Result calculation and viewing for students and faculty
+- Profile management and dashboards
 
-## 🚀 Features
+## Technologies Used
 
-- 🔐 Secure login system for Students and Teachers
-- 📚 Role-based dashboards (`/student_dashboard` and `/teacher_dashboard`)
-- 📝 Teachers can create exams and add questions
-- ❓ Support for MCQ and True/False questions
-- ✅ Password confirmation during registration
-- 🌐 Flask-CORS for frontend/backend integration
-- 📡 Can be accessed on mobile through local IP
+- Python Flask
+- MySQL
+- HTML, CSS, JavaScript
 
----
+## Setup Instructions
 
-## 🧰 Tech Stack
+1. Install required Python packages:
+   ```
+   pip install flask flask-cors mysql-connector-python
+   ```
 
-| Component     | Technology          |
-|---------------|---------------------|
-| Backend       | Python (Flask)      |
-| Frontend      | HTML (Flask templates) |
-| Database      | MySQL               |
-| Integration   | Flask-CORS          |
+2. Set up MySQL database and import schema from `exam_portal.sql`.
 
----
+3. Run the Flask app:
+   ```
+   python app.py
+   ```
 
-## 📁 Project Structure
+4. Access the app at `http://localhost:5000`.
 
-```
-exam-portal/
-│
-├── templates/
-│   ├── login.html
-│   ├── register.html
-│   ├── teacher_dashboard.html
-│   ├── student_dashboard.html
-│   ├── create_exam.html
-│   └── add_questions.html
-│
-├── static/               # Optional - CSS, JS, images
-├── app.py                # Main Flask application
-└── README.md
-```
+## License
 
----
-
-## ⚙️ Installation
-
-### 🔽 1. Clone the Repository
-
-```bash
-git clone https://github.com/your-username/exam-portal.git
-cd exam-portal
-```
-
-### 📦 2. Install Required Packages
-
-```bash
-pip install flask flask-cors mysql-connector-python
-```
-
-### 🧱 3. Set Up MySQL Database
-
-- Create a MySQL database named `exam_portal`
-
-```
-
-### ⚙️ 4. Configure MySQL in `app.py`
-
-```python
-conn = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="root",
-    database="exam_portal"
-)
-```
-
----
-
-## 📲 Accessing on Your Phone (Local Network Hosting)
-
-### ✅ Update this in your `app.py`:
-
-```python
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
-```
-
-### 📱 Steps:
-
-1. Run the app: `python app.py`
-2. Get your computer’s local IP:
-   - Windows: `ipconfig` → IPv4 address
-   - Mac/Linux: `ifconfig`
-3. On your phone (connected to same Wi-Fi), open browser and go to:
-
-```
-http://<your-local-ip>:5000
-```
-
-Example:
-```
-http:<your ip>:<your port number>
-```
-
----
-
-## 💡 Future Enhancements
-
-- Student Exam Attempt Portal
-- Results & Marks Dashboard
-- Admin Panel
-- Dockerization
-- Hosting on Render/Heroku
-
----
-
-## 👨‍💻 Developed By
-
-**Rishit Tandon**  
-🌐 [LinkedIn](https://www.linkedin.com/in/rishit-tandon)  
-📧 rishit.tandon.7@gmail.com
+This project is licensed under the MIT License.
