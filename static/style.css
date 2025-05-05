@@ -1,0 +1,177 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap');
+
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Montserrat', sans-serif;
+    background: linear-gradient(270deg, #00f7ff, #ff3195, #8662c9);
+    background-size: 600% 600%;
+    animation: gradientBG 10s ease infinite;
+    color: #fff;
+    overflow-x: hidden;
+}
+
+@keyframes gradientBG {
+    0%{background-position:0% 25%}
+    25%{background-position:25% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
+}
+
+.hero {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(8px);
+    animation: fadeIn 1.5s ease forwards;
+}
+
+@keyframes fadeIn {
+    from {opacity: 0; transform: translateY(20px);}
+    to {opacity: 1; transform: translateY(0);}
+}
+
+.container {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 50px 40px;
+    border-radius: 25px;
+    box-shadow: 0 0 40px rgba(255, 255, 255, 0.3);
+    width: 100%;
+    max-width: 420px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    animation: fadeIn 2s ease forwards;
+}
+
+h2 {
+    font-weight: 700;
+    font-size: 34px;
+    margin-bottom: 30px;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    text-shadow: 0 0 10px rgba(255,255,255,0.7);
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.input-group {
+    text-align: left;
+}
+
+label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #fff;
+    font-size: 15px;
+    text-shadow: 0 0 5px rgba(0,0,0,0.5);
+}
+
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 15px 20px;
+    border: none;
+    border-radius: 15px;
+    font-size: 16px;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    box-sizing: border-box;
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    text-shadow: 0 0 3px rgba(0,0,0,0.7);
+    backdrop-filter: blur(5px);
+}
+
+input[type="email"]::placeholder,
+input[type="password"]::placeholder {
+    color: #eee;
+}
+
+input[type="email"]:focus,
+input[type="password"]:focus {
+    outline: none;
+    box-shadow: 0 0 15px #ff6a00;
+    transform: scale(1.05);
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, #ff6a00, #ee0979);
+    color: white;
+    border: none;
+    padding: 15px 0;
+    font-weight: 700;
+    font-size: 18px;
+    border-radius: 25px;
+    cursor: pointer;
+    letter-spacing: 2px;
+    box-shadow: 0 0 20px #ff6a00;
+    transition: box-shadow 0.4s ease, transform 0.4s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary:hover {
+    box-shadow: 0 0 40px #ee0979;
+    transform: scale(1.1);
+}
+
+.btn-primary::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 300%;
+    height: 300%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translate(-50%, -50%) scale(0);
+    border-radius: 50%;
+    transition: transform 0.5s ease;
+    pointer-events: none;
+}
+
+.btn-primary:hover::after {
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.register-btn {
+    display: inline-block;
+    margin-top: 30px;
+    color: #fff;
+    font-weight: 600;
+    text-decoration: underline;
+    font-size: 16px;
+    transition: color 0.3s ease;
+    text-shadow: 0 0 5px rgba(0,0,0,0.5);
+}
+
+.register-btn:hover {
+    color: #ff6a00;
+}
+
+#error, #message {
+    color: #ff4d4d;
+    margin-top: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    text-shadow: 0 0 3px rgba(0,0,0,0.7);
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 40px 20px;
+        width: 95%;
+    }
+
+    h2 {
+        font-size: 28px;
+    }
+}

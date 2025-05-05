@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Available Exams</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <h1>Available Exams</h1>
+  <a href="{{ url_for('student_dashboard') }}">Back to Dashboard</a>
+  <table border="1" cellpadding="10" cellspacing="0">
+    <thead>
+      <tr>
+        <th>Exam ID</th>
+        <th>Subject</th>
+        <th>Date</th>
+        <th>Duration (minutes)</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for exam in exams %}
+      <tr>
+        <td>{{ exam.Exam_ID }}</td>
+        <td>{{ exam.Subject }}</td>
+        <td>{{ exam.Date }}</td>
+        <td>{{ exam.Duration }}</td>
+        <td>
+          <a href="#">Take Exam</a> <!-- Placeholder for exam taking functionality -->
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5">No exams available.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>

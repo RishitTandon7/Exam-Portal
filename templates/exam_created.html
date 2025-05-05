@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Exam Created</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #e0c3fc, #8ec5fc);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      color: #333;
+    }
+    .animation {
+      margin-bottom: 30px;
+      font-size: 3rem;
+      color: #4caf50;
+      animation: popIn 1s ease forwards;
+    }
+    @keyframes popIn {
+      0% {
+        transform: scale(0);
+        opacity: 0;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+    .options {
+      display: flex;
+      gap: 20px;
+    }
+    .options button {
+      background: #6a11cb;
+      color: white;
+      border: none;
+      padding: 15px 25px;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .options button:hover {
+      background: #2575fc;
+    }
+    a {
+      color: inherit;
+      text-decoration: none;
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div class="animation">🎉 Exam Created Successfully! 🎉</div>
+  <div class="options">
+    <button><a href="{{ url_for('view_results', exam_id=exam_id) }}">View Results</a></button>
+    <button><a href="{{ url_for('create_exam') }}">Create Another Exam</a></button>
+    <button><a href="{{ url_for('teacher_dashboard') }}">Go to Dashboard</a></button>
+  </div>
+</body>
+</html>

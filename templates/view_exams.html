@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Manage Exams</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #e0eafc, #cfdef3);
+      padding: 40px 20px;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 2.5rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+      overflow: hidden;
+    }
+    th, td {
+      padding: 15px 20px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background: #6a11cb;
+      color: white;
+    }
+    tr:hover {
+      background: #f0f4ff;
+    }
+    a.button {
+      display: inline-block;
+      padding: 8px 15px;
+      background: #6a11cb;
+      color: white;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background 0.3s ease;
+    }
+    a.button:hover {
+      background: #2575fc;
+    }
+  </style>
+</head>
+<body>
+  <h1>Manage Exams</h1>
+  {% if exams %}
+  <table>
+    <thead>
+      <tr>
+        <th>Exam ID</th>
+        <th>Subject</th>
+        <th>Date</th>
+        <th>Duration (min)</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for exam in exams %}
+      <tr>
+        <td>{{ exam.Exam_ID }}</td>
+        <td>{{ exam.Subject }}</td>
+        <td>{{ exam.Date }}</td>
+        <td>{{ exam.Duration }}</td>
+        <td>
+          <a href="{{ url_for('view_results', exam_id=exam.Exam_ID) }}" class="button">View Results</a>
+          <!-- Additional actions like Edit/Delete can be added here -->
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>No exams found.</p>
+  {% endif %}
+</body>
+</html>

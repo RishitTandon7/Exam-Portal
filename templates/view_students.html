@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Registered Students</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    /* Background animation */
+    @keyframes gradientBG {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+    @keyframes shootingStar {
+      0% {
+        transform: translateX(0) translateY(0) scale(1);
+        opacity: 1;
+      }
+      100% {
+        transform: translateX(500px) translateY(-500px) scale(0);
+        opacity: 0;
+      }
+    }
+    body {
+      font-family: 'Roboto', sans-serif;
+      margin: 20px;
+      background: linear-gradient(-45deg, #1e3c72, #2a5298, #1e3c72, #2a5298);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      color: #f0f0f0;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+    /* Shooting star styles */
+    .shooting-star {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 3px;
+      height: 100px;
+      background: linear-gradient(-45deg, white, rgba(255, 255, 255, 0));
+      border-radius: 50%;
+      filter: drop-shadow(0 0 6px white);
+      animation: shootingStar 1.5s ease-in-out forwards;
+      opacity: 0;
+      pointer-events: none;
+    }
+    h1 {
+      color: #ffffff;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+      font-weight: 700;
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 1;
+    }
+    a {
+      display: inline-block;
+      margin-bottom: 20px;
+      text-decoration: none;
+      color: #ffd700;
+      font-weight: 700;
+      font-size: 1.1em;
+      transition: color 0.3s ease;
+      position: relative;
+      z-index: 1;
+    }
+    a:hover {
+      color: #ffa500;
+      text-decoration: underline;
+    }
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 10px;
+      background-color: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      z-index: 1;
+    }
+    th, td {
+      padding: 15px 20px;
+      text-align: left;
+      font-weight: 400;
+      font-size: 1em;
+      color: #f0f0f0;
+    }
+    th {
+      background-color: rgba(255, 255, 255, 0.25);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      box-shadow: inset 0 -1px 0 rgba(255,255,255,0.3);
+    }
+    tbody tr {
+      background-color: rgba(255, 255, 255, 0.15);
+      transition: background-color 0.3s ease;
+      border-radius: 8px;
+    }
+    tbody tr:hover {
+      background-color: rgba(255, 255, 255, 0.3);
+      cursor: pointer;
+    }
+    tbody tr td:first-child {
+      border-top-left-radius: 8px;
+      border-bottom-left-radius: 8px;
+    }
+    tbody tr td:last-child {
+      border-top-right-radius: 8px;
+      border-bottom-right-radius: 8px;
+    }
+    .no-data {
+      text-align: center;
+      font-style: italic;
+      color: #ddd;
+      padding: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Registered Students</h1>
+  <a href="{{ url_for('teacher_dashboard') }}">&#8592; Back to Dashboard</a>
+  <table>
+    <thead>
+      <tr>
+        <th>Student ID</th>
+        <th>Name</th>
+        <th>Email</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if students %}
+        {% for student in students %}
+        <tr>
+          <td>{{ student.Student_ID }}</td>
+          <td>{{ student.Name }}</td>
+          <td>{{ student.Email }}</td>
+        </tr>
+        {% endfor %}
+      {% else %}
+      <tr><td colspan="3" class="no-data">No students found.</td></tr>
+      {% endif %}
+    </tbody>
+  </table>
+  <script>
+    // Create shooting stars at random intervals and positions
+    function createShootingStar() {
+      const star = document.createElement('div');
+      star.classList.add('shooting-star');
+      star.style.top = Math.random() * window.innerHeight * 0.5 + 'px';
+      star.style.left = Math.random() * window.innerWidth + 'px';
+      document.body.appendChild(star);
+      star.style.opacity = '1';
+      star.style.animation = 'shootingStar 1.5s ease-in-out forwards';
+      setTimeout(() => {
+        star.remove();
+      }, 1500);
+    }
+    setInterval(createShootingStar, 1000);
+  </script>
+</body>
+</html>

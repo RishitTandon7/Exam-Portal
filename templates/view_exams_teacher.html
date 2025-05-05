@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Manage Exams</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <h1>Your Exams</h1>
+  <a href="{{ url_for('teacher_dashboard') }}">Back to Dashboard</a>
+  <table border="1" cellpadding="10" cellspacing="0">
+    <thead>
+      <tr>
+        <th>Exam ID</th>
+        <th>Subject</th>
+        <th>Date</th>
+        <th>Duration (minutes)</th>
+        <th>Results Published</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for exam in exams %}
+      <tr>
+        <td>{{ exam.Exam_ID }}</td>
+        <td>{{ exam.Subject }}</td>
+        <td>{{ exam.Date }}</td>
+        <td>{{ exam.Duration }}</td>
+        <td>{{ 'Yes' if exam.Results_Published else 'No' }}</td>
+        <td>
+          <a href="{{ url_for('add_questions', exam_id=exam.Exam_ID) }}">Add Questions</a> |
+          {% if not exam.Results_Published %}
+          <a href="{{ url_for('publish_results', exam_id=exam.Exam_ID) }}">Publish Results</a>
+          {% else %}
+          Results Published
+          {% endif %}
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6">No exams found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>

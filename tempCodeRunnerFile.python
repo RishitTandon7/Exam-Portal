@@ -1,0 +1,356 @@
+from flask_cors import CORS
+from flask import Flask, request, render_template, redirect, url_for, jsonify, session
+import mysql.connector
+
+app = Flask(__name__)
+app.secret_key = 'your_secret_key'  # Needed for session management
+CORS(app)
+users = []
+# MySQL Connection
+conn = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="root",
+    database="exam_portal"
+)
+cursor = conn.cursor(dictionary=True)
+
+# In-memory questions store: { exam_id: [ {question data}, ... ] }
+questions_store = {}
+
+@app.route('/')
+def home():
+    return redirect(url_for('login'))
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+
+        if email.endswith("@student.com"):
+            cursor.execute("SELECT * FROM Student WHERE Email=%s AND Password=%s", (email, password))
+            user = cursor.fetchone()
+            if user:
+                session['student_id'] = user['Student_ID']
+                return redirect(url_for('student_dashboard'))
+            else:
+                return "Invalid student credentials", 401
+
+        elif email.endswith("@teacher.com"):
+            cursor.execute("SELECT * FROM Faculty WHERE Email=%s AND Password=%s", (email, password))
+            user = cursor.fetchone()
+            if user:
+                session['faculty_id'] = user['Faculty_ID']
+                return redirect(url_for('teacher_dashboard'))
+            else:
+                return "Invalid teacher credentials", 401
+
+        return "Invalid credentials", 400
+
+    return render_template('login.html')
+    
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        name = request.form['name']
+        email = request.form['email']
+        password = request.form['password']
+        confirm_password = request.form['confirm_password']
+
+        if password != confirm_password:
+            return "Passwords do not match!"
+
+        try:
+            print(f"Trying to register: {name}, {email}")
+
+            if email.endswith("@student.com"):
+                cursor.execute("INSERT INTO Student (Name, Email, Password) VALUES (%s, %s, %s)", (name, email, password))
+            elif email.endswith("@teacher.com"):
+                cursor.execute("INSERT INTO Faculty (Name, Email, Password) VALUES (%s, %s, %s)", (name, email, password))
+            else:
+                return "Invalid email domain. Use @student.com or @teacher.com"
+
+            conn.commit()
+            print("Registration successful, data committed.")
+            return redirect(url_for('login'))
+
+        except mysql.connector.Error as err:
+            print("DB Error:", err)
+            return f"Database error: {err}"
+
+    return render_template('register.html')
+
+@app.route('/create_exam', methods=['GET', 'POST'])
+def create_exam():
+    if request.method == 'POST':
+        subject = request.form['subject']
+        date = request.form['date']
+        duration = request.form['duration']
+        faculty_email = request.form['email']
+
+        # Get Faculty_ID from email
+        cursor.execute("SELECT Faculty_ID FROM Faculty WHERE Email=%s", (faculty_email,))
+        result = cursor.fetchone()
+        if not result:
+            return "Invalid Faculty Email"
+        faculty_id = result['Faculty_ID']
+
+        cursor.execute("INSERT INTO Exam (Subject, Date, Duration, Faculty_ID) VALUES (%s, %s, %s, %s)",
+                       (subject, date, duration, faculty_id))
+        conn.commit()
+        exam_id = cursor.lastrowid
+        # Instead of redirecting to add_questions, render exam_created page
+        return render_template('exam_created.html', exam_id=exam_id)
+
+    return render_template('create_exam.html')
+
+@app.route('/add_questions/<int:exam_id>', methods=['GET', 'POST'])
+def add_questions(exam_id):
+    if request.method == 'POST':
+        question_type = request.form['type']
+        marks = request.form['marks']
+        difficulty = request.form['difficulty']
+        question_text = request.form['question']
+
+        # Store question in local in-memory store
+        question_data = {
+            'Question_ID': len(questions_store.get(exam_id, [])) + 1,
+            'Type': question_type,
+            'Marks': int(marks),
+            'Difficulty_Level': difficulty,
+            'Question_Text': question_text,
+            'Options': []
+        }
+
+        if question_type in ['MCQ', 'True/False']:
+            for i in range(1, 5):
+                option_text = request.form.get(f'option_{i}')
+                is_correct = request.form.get('correct') == str(i)
+                if option_text:
+                    question_data['Options'].append({
+                        'Option_ID': i,
+                        'Option_Text': option_text,
+                        'Is_Correct': is_correct,
+                        'Option_Order': i
+                    })
+
+        if exam_id not in questions_store:
+            questions_store[exam_id] = []
+        questions_store[exam_id].append(question_data)
+
+        return redirect(url_for('add_questions', exam_id=exam_id))  # keep adding
+
+    return render_template('add_questions.html', exam_id=exam_id)
+
+
+@app.route('/teacher_dashboard')
+def teacher_dashboard():
+    return render_template('teacher_dashboard.html')
+
+@app.route('/student_exams')
+def student_exams():
+    if 'student_id' not in session:
+        return redirect(url_for('login'))
+
+    student_id = session['student_id']
+
+    # Get student's Course_ID
+    cursor.execute("SELECT Course_ID FROM Student WHERE Student_ID = %s", (student_id,))
+    student_course = cursor.fetchone()
+    print(f"Student Course: {student_course}")
+    if not student_course or not student_course['Course_ID']:
+        # If no course assigned, show all exams
+        cursor.execute("SELECT Exam_ID, Subject, Date, Duration FROM Exam")
+        exams = cursor.fetchall()
+    else:
+        course_id = student_course['Course_ID']
+        print(f"Course ID: {course_id}")
+
+        # Get Faculty_ID associated with the student's course
+        cursor.execute("SELECT Faculty_ID FROM Course WHERE Course_ID = %s", (course_id,))
+        faculty = cursor.fetchone()
+        print(f"Faculty: {faculty}")
+        if not faculty or not faculty['Faculty_ID']:
+            exams = []
+        else:
+            faculty_id = faculty['Faculty_ID']
+            print(f"Faculty ID: {faculty_id}")
+
+            # Fetch exams given by this faculty
+            cursor.execute("""
+                SELECT Exam_ID, Subject, Date, Duration
+                FROM Exam
+                WHERE Faculty_ID = %s
+            """, (faculty_id,))
+            exams = cursor.fetchall()
+            print(f"Exams fetched: {exams}")
+
+    return render_template('student_exams.html', exams=exams)
+
+@app.route('/take_exam/<int:exam_id>', methods=['GET', 'POST'])
+def take_exam(exam_id):
+    if request.method == 'POST':
+        # Process submitted answers
+        answers = {}
+        for key, value in request.form.items():
+            if key.startswith('answer_'):
+                question_id = int(key.split('_')[1])
+                answers[question_id] = value
+
+        # TODO: Calculate score and store result
+        # Save answers to database
+        # Get student_id from session (assuming login sets session)
+        student_id = None
+        if 'student_id' in session:
+            student_id = session['student_id']
+        else:
+            # For now, return error if student not logged in
+            return "Student not logged in", 401
+
+        # Insert answers into Student_Answer table
+        for question_id, answer in answers.items():
+            try:
+                option_id = int(answer)
+                cursor.execute("""
+                    INSERT INTO Student_Answer (Student_ID, Exam_ID, Question_ID, Option_ID)
+                    VALUES (%s, %s, %s, %s)
+                """, (student_id, exam_id, question_id, option_id))
+            except ValueError:
+                cursor.execute("""
+                    INSERT INTO Student_Answer (Student_ID, Exam_ID, Question_ID, Answer_Text)
+                    VALUES (%s, %s, %s, %s)
+                """, (student_id, exam_id, question_id, answer))
+        conn.commit()
+
+        # Calculate score
+        cursor.execute("""
+            SELECT q.Question_ID, q.Marks, o.Is_Correct, sa.Option_ID
+            FROM Question q
+            LEFT JOIN Options o ON q.Question_ID = o.Question_ID AND o.Is_Correct = TRUE
+            LEFT JOIN Student_Answer sa ON q.Question_ID = sa.Question_ID AND sa.Student_ID = %s
+            WHERE q.Exam_ID = %s
+        """, (student_id, exam_id))
+        results = cursor.fetchall()
+
+        total_score = 0
+        for row in results:
+            if row['Option_ID'] == row['Is_Correct']:
+                total_score += row['Marks']
+
+        # Insert or update Result table
+        cursor.execute("""
+            SELECT Result_ID FROM Result WHERE Student_ID = %s AND Exam_ID = %s
+        """, (student_id, exam_id))
+        existing_result = cursor.fetchone()
+
+        status = 'Pass' if total_score >= 0.5 * sum(r['Marks'] for r in results) else 'Fail'
+
+        if existing_result:
+            cursor.execute("""
+                UPDATE Result SET Score = %s, Status = %s WHERE Result_ID = %s
+            """, (total_score, status, existing_result['Result_ID']))
+        else:
+            cursor.execute("""
+                INSERT INTO Result (Student_ID, Exam_ID, Score, Status)
+                VALUES (%s, %s, %s, %s)
+            """, (student_id, exam_id, total_score, status))
+        conn.commit()
+
+        return "Exam submitted successfully!"
+   
+    # Fetch questions for the exam from DB
+    cursor.execute("""
+        SELECT q.Question_ID, q.Type, q.Marks, q.Difficulty_Level,
+               o.Option_ID, o.Option_Text, o.Is_Correct, o.Option_Order
+        FROM Question q
+        LEFT JOIN Options o ON q.Question_ID = o.Question_ID
+        WHERE q.Exam_ID = %s
+        ORDER BY q.Question_ID, o.Option_Order
+    """, (exam_id,))
+    rows = cursor.fetchall()
+
+    # If no questions in DB, fallback to in-memory store
+    if not rows and exam_id in questions_store:
+        questions_list = questions_store[exam_id]
+        print(f"Using in-memory questions for exam {exam_id}: {questions_list}")
+    else:
+        # Organize questions and options from DB rows
+        questions = {}
+        for row in rows:
+            qid = row['Question_ID']
+            if qid not in questions:
+                questions[qid] = {
+                    'Question_ID': qid,
+                    'Type': row['Type'],
+                    'Marks': row['Marks'],
+                    'Difficulty_Level': row['Difficulty_Level'],
+                    'Question_Text': '',
+                    'Options': []
+                }
+            if row['Option_ID']:
+                questions[qid]['Options'].append({
+                    'Option_ID': row['Option_ID'],
+                    'Option_Text': row['Option_Text'],
+                    'Is_Correct': row['Is_Correct'],
+                    'Option_Order': row['Option_Order']
+                })
+        questions_list = list(questions.values())
+
+    if not questions_list:
+        return "No questions found for this exam."
+
+    return render_template('take_exam.html', exam_id=exam_id, questions=questions_list)
+
+@app.route('/student_dashboard')
+def student_dashboard():
+    return render_template('student_dashboard.html')
+
+@app.route('/view_students')
+def view_students():
+    cursor.execute("SELECT Student_ID, Name, Email FROM Student")
+    students = cursor.fetchall()
+    return render_template('view_students.html', students=students)
+
+@app.route('/view_exams')
+def view_exams():
+    cursor.execute("SELECT Exam_ID, Subject, Date, Duration FROM Exam")
+    exams = cursor.fetchall()
+    return render_template('view_exams.html', exams=exams)
+
+@app.route('/view_results/<int:exam_id>')
+def view_results(exam_id):
+    # Fetch results for the exam
+    cursor.execute("""
+        SELECT r.Result_ID, r.Score, r.Status, s.Name AS Student_Name
+        FROM Result r
+        JOIN Student s ON r.Student_ID = s.Student_ID
+        WHERE r.Exam_ID = %s
+    """, (exam_id,))
+    results = cursor.fetchall()
+    return render_template('view_results.html', exam_id=exam_id, results=results)
+
+# Removed duplicate add_questions route to fix endpoint overwrite error
+
+
+
+@app.route('/my-profile')
+def my_profile():
+    user = None
+    role = None
+    if 'student_id' in session:
+        cursor.execute("SELECT * FROM Student WHERE Student_ID = %s", (session['student_id'],))
+        user = cursor.fetchone()
+        role = 'Student'
+    elif 'faculty_id' in session:
+        cursor.execute("SELECT * FROM Faculty WHERE Faculty_ID = %s", (session['faculty_id'],))
+        user = cursor.fetchone()
+        role = 'Faculty'
+    else:
+        return redirect(url_for('login'))
+
+    return render_template('profile.html', user=user, role=role)
+
+
+if __name__ == '__main__':
+    app.run(debug=True)

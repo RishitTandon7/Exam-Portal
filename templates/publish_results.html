@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Publish Results</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <h1>Publish Results for Exam: {{ exam.Subject }}</h1>
+  <p>Date: {{ exam.Date }}</p>
+  <p>Duration: {{ exam.Duration }} minutes</p>
+  <form method="POST">
+    <button type="submit">Confirm Publish Results</button>
+  </form>
+  <a href="{{ url_for('view_exams') }}">Cancel</a>
+</body>
+</html>

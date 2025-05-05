@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Create Exam</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #e0c3fc, #8ec5fc);
+      font-family: 'Poppins', sans-serif;
+      padding: 50px;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 2.5rem;
+    }
+    form {
+      background: #fff;
+      padding: 30px;
+      border-radius: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: 600;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    .question-block {
+      background: #f0f4ff;
+      padding: 20px;
+      border-radius: 12px;
+      margin-top: 25px;
+      box-shadow: 0 5px 12px rgba(0,0,0,0.1);
+    }
+    .option-input {
+      margin-top: 10px;
+    }
+    button {
+      background: #6a11cb;
+      color: white;
+      padding: 12px 25px;
+      margin-top: 25px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #2575fc;
+    }
+  </style>
+</head>
+<body>
+  <h1>Create New Exam 📝</h1>
+  <form method="POST" action="/create_exam">
+    <label>Subject</label>
+    <input type="text" name="subject" required>
+
+    <label>Date</label>
+    <input type="date" name="date" required>
+
+    <label>Duration (minutes)</label>
+    <input type="number" name="duration" required>
+
+    <label>Faculty Email</label>
+    <input type="email" name="email" required>
+
+    <div id="questions"></div>
+
+    <button type="button" onclick="addQuestion()">➕ Add Question</button><br><br>
+    <button type="submit">✅ Done</button>
+  </form>
+
+  <script>
+    let qCount = 0;
+    function addQuestion() {
+      qCount++;
+      const questionsDiv = document.getElementById('questions');
+      const block = document.createElement('div');
+      block.className = "question-block";
+      block.innerHTML = `
+        <h3>Question ${qCount}</h3>
+        <label>Type</label>
+        <select name="qtype${qCount}" onchange="toggleOptions(this, ${qCount})">
+          <option value="MCQ">MCQ</option>
+          <option value="Descriptive">Descriptive</option>
+          <option value="True/False">True/False</option>
+        </select>
+
+        <label>Marks</label>
+        <input type="number" name="qmarks${qCount}" required>
+
+        <label>Difficulty</label>
+        <select name="qdifficulty${qCount}">
+          <option value="Easy">Easy</option>
+          <option value="Medium">Medium</option>
+          <option value="Hard">Hard</option>
+        </select>
+
+        <label>Question Text</label>
+        <textarea name="qtext${qCount}" required></textarea>
+
+        <div id="options${qCount}">
+          <label>Options (Only for MCQ / True/False)</label>
+          <input type="text" class="option-input" name="opt${qCount}_1" placeholder="Option 1" required>
+          <input type="text" class="option-input" name="opt${qCount}_2" placeholder="Option 2" required>
+          <input type="text" class="option-input" name="opt${qCount}_3" placeholder="Option 3">
+          <input type="text" class="option-input" name="opt${qCount}_4" placeholder="Option 4">
+
+          <label>Correct Option (1-4)</label>
+          <input type="number" name="correct${qCount}" min="1" max="4" required>
+        </div>
+      `;
+      questionsDiv.appendChild(block);
+    }
+
+    function toggleOptions(select, id) {
+      const optionsDiv = document.getElementById(`options${id}`);
+      if (select.value === 'Descriptive') {
+        optionsDiv.style.display = 'none';
+      } else if (select.value === 'True/False') {
+        optionsDiv.style.display = 'block';
+        // Show only first two options, hide option 3 and 4
+        optionsDiv.querySelector('input[name="opt' + id + '_3"]').style.display = 'none';
+        optionsDiv.querySelector('input[name="opt' + id + '_4"]').style.display = 'none';
+        // Make option 3 and 4 not required
+        optionsDiv.querySelector('input[name="opt' + id + '_3"]').required = false;
+        optionsDiv.querySelector('input[name="opt' + id + '_4"]').required = false;
+      } else {
+        optionsDiv.style.display = 'block';
+        // Show all options and make them required as per original
+        optionsDiv.querySelector('input[name="opt' + id + '_3"]').style.display = 'block';
+        optionsDiv.querySelector('input[name="opt' + id + '_4"]').style.display = 'block';
+        optionsDiv.querySelector('input[name="opt' + id + '_3"]').required = false;
+        optionsDiv.querySelector('input[name="opt' + id + '_4"]').required = false;
+      }
+    }
+  </script>
+</body>
+</html>

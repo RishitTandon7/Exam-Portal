@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Add Questions</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #e0eafc, #cfdef3);
+      padding: 40px 20px;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 2.5rem;
+    }
+    form {
+      max-width: 700px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    input[type="text"], select, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      resize: vertical;
+    }
+    .options-group {
+      margin-bottom: 15px;
+    }
+    .option-input {
+      margin-bottom: 8px;
+    }
+    button {
+      background: #6a11cb;
+      color: white;
+      padding: 12px 25px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      display: block;
+      margin: 20px auto 0;
+    }
+    button:hover {
+      background: #2575fc;
+    }
+  </style>
+  <script>
+    function toggleOptions() {
+      var typeSelect = document.getElementById('type');
+      var optionsDiv = document.getElementById('optionsDiv');
+      if (typeSelect.value === 'MCQ' || typeSelect.value === 'True/False') {
+        optionsDiv.style.display = 'block';
+      } else {
+        optionsDiv.style.display = 'none';
+      }
+    }
+    window.onload = function() {
+      toggleOptions();
+      document.getElementById('type').addEventListener('change', toggleOptions);
+    };
+  </script>
+</head>
+<body>
+  <h1>Add Questions to Exam {{ exam_id }}</h1>
+  <form method="POST" action="{{ url_for('add_questions', exam_id=exam_id) }}">
+    <label for="type">Question Type</label>
+    <select id="type" name="type" required>
+      <option value="MCQ">MCQ</option>
+      <option value="Descriptive">Descriptive</option>
+      <option value="True/False">True/False</option>
+    </select>
+
+    <label for="marks">Marks</label>
+    <input type="number" id="marks" name="marks" required min="1" title="Please enter a valid number" />
+
+    <label for="difficulty">Difficulty Level</label>
+    <select id="difficulty" name="difficulty" required>
+      <option value="Easy">Easy</option>
+      <option value="Medium">Medium</option>
+      <option value="Hard">Hard</option>
+    </select>
+
+    <label for="question">Question Text</label>
+    <textarea id="question" name="question" rows="4" required></textarea>
+
+    <div id="optionsDiv" style="display:none;">
+      <label>Options (for MCQ and True/False)</label>
+      <div class="options-group">
+        <input class="option-input" type="text" name="option_1" placeholder="Option 1" />
+        <input class="option-input" type="text" name="option_2" placeholder="Option 2" />
+        <input class="option-input" type="text" name="option_3" placeholder="Option 3" />
+        <input class="option-input" type="text" name="option_4" placeholder="Option 4" />
+      </div>
+      <label for="correct">Correct Option Number (1-4)</label>
+      <input type="text" id="correct" name="correct" pattern="[1-4]" title="Enter a number between 1 and 4" />
+    </div>
+
+    <button type="submit">Add Question</button>
+  </form>
+</body>
+</html>
