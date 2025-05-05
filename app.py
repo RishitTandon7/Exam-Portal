@@ -8,6 +8,10 @@ app.secret_key = 'your_secret_key'
 CORS(app)
 logging.basicConfig(level=logging.DEBUG)
 
+# Flask app initialization and configuration
+# Secret key is used for session management
+# CORS enabled for cross-origin requests
+
 # MySQL Connection
 conn = mysql.connector.connect(
     host="localhost",
@@ -25,6 +29,10 @@ def home():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    """
+    Handle user login for students and faculty.
+    Validates email and password, sets session variables.
+    """
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
@@ -54,6 +62,10 @@ def login():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    """
+    Handle user registration for students and faculty.
+    Validates input and inserts user into database.
+    """
     if request.method == 'POST':
         name = request.form['name']
         email = request.form['email']
