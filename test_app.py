@@ -20,5 +20,22 @@ class ExamPortalTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Register', response.data)
 
+    def test_student_dashboard_redirect(self):
+        response = self.app.get('/student_dashboard')
+        self.assertEqual(response.status_code, 302)  # Redirect to login if not logged in
+
+    def test_teacher_dashboard_redirect(self):
+        response = self.app.get('/teacher_dashboard')
+        self.assertEqual(response.status_code, 302)  # Redirect to login if not logged in
+
+    def test_create_exam_page(self):
+        response = self.app.get('/create_exam')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Create New Exam', response.data)
+
+    def test_login_post_invalid(self):
+        response = self.app.post('/login', data=dict(email='invalid@example.com', password='wrong'))
+        self.assertIn(response.status_code, [400, 401])
+
 if __name__ == '__main__':
     unittest.main()
