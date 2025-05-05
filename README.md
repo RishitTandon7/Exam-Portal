@@ -35,3 +35,15 @@ This is a web-based Exam Portal application built with Flask and MySQL. It suppo
 ## License
 
 This project is licensed under the MIT License.
+
+## Contribution Guidelines
+
+Contributions are welcome! Please follow these steps to contribute:
+
+1. Fork the repository.
+2. Create a new branch for your feature or bugfix.
+3. Write clear, concise commit messages.
+4. Ensure code is well-documented and tested.
+5. Submit a pull request describing your changes.
+
+Thank you for helping improve the Exam Portal!
